@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Quiz Capítulo 2</title>
+<style>body { font-family: Arial; max-width: 600px; margin: auto; padding: 1em; }</style>
+</head>
+<body>
+<h1>Quiz – Capítulo 2</h1>
+<div id="quiz-container"></div>
+<div id="score-container" style="display:none; margin-top: 2em;"></div>
+
+<script>
+const questions = [
+  { q: "¿Cómo reaccionan los niños al ver el monstruo de goo?", opts: ["Se asustan y corren", "Se ríen", "Le tiran dulces"], ans: 0 },
+  { q: "¿Qué hace la Princesa Magnolia?", opts: ["Se transforma en la Princesa in Black", "Pide ayuda", "Se esconde"], ans: 0 }
+  { q: "¿Cómo de difícil te ha parecido este quiz?", opts: ["Fácil", "Normal", "Difícil"], ans: null, val: 0, final: true }
+];
+let current = 0, totalPoints = 0, maxPoints = 0;
+function showQ() {
+  const q = questions[current];
+  const qc = document.getElementById("quiz-container");
+  qc.innerHTML = `<p><strong>P${current+1}.</strong> ${q.q}</p>`;
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = o;
+    btn.style.display = "block";
+    btn.style.margin = "0.5em 0";
+    btn.onclick = () => select(i);
+    qc.appendChild(btn);
+  });
+}
+function select(i) {
+  const q = questions[current];
+  if (!q.final && i === q.ans) totalPoints += (q.val || 1);
+  if (!q.final) maxPoints += (q.val || 1);
+  current++;
+  if (current < questions.length) showQ();
+  else finish();
+}
+function finish() {
+  let nota = maxPoints > 0 ? (totalPoints / maxPoints * 10).toFixed(1) : "0.0";
+  let datos = JSON.parse(localStorage.getItem("quizData") || "[]");
+  datos.push({ cap: 2, puntos: totalPoints, max: maxPoints, nota, fecha: new Date().toISOString() });
+  localStorage.setItem("quizData", JSON.stringify(datos));
+  document.getElementById("quiz-container").style.display = "none";
+  document.getElementById("score-container").innerHTML = `<p>Puntos: ${totalPoints} / ${maxPoints}</p><p>Nota: ${nota} / 10</p>`;
+  document.getElementById("score-container").style.display = "block";
+}
+showQ();
+</script>
+</body>
+</html>
